@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowLeft, Mic, Volume2, BookOpen, Lightbulb } from "lucide-react";
+import { ArrowLeft, Mic, Volume2, BookOpen, Lightbulb, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 const words = [
   { mr: "नमस्कार", roman: "Namaskaar", en: "Hello / Greetings", example: "नमस्कार! मी रोहन आहे." },
@@ -30,6 +33,43 @@ const patterns = [
     ],
   },
 ];
+
+async function playTTS(text: string, setLoading: (v: boolean) => void) {
+  setLoading(true);
+  try {
+    const res = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) throw new Error("TTS failed");
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play();
+    audio.onended = () => URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function SpeakButton({ text }: { text: string }) {
+  const [loading, setLoading] = useState(false);
+  return (
+    <button
+      onClick={() => playTTS(text, setLoading)}
+      disabled={loading}
+      className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0 hover:bg-indigo-100 transition-colors disabled:opacity-50"
+      title="Hear pronunciation"
+    >
+      {loading
+        ? <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
+        : <Volume2 className="w-4 h-4 text-indigo-500" />}
+    </button>
+  );
+}
 
 export default function LessonPage() {
   return (
@@ -68,9 +108,7 @@ export default function LessonPage() {
                     <p className="text-sm font-semibold text-slate-500 mt-0.5">{w.roman}</p>
                     <p className="text-sm text-slate-600 mt-1">{w.en}</p>
                   </div>
-                  <button className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0 hover:bg-indigo-100 transition-colors" title="Hear pronunciation">
-                    <Volume2 className="w-4 h-4 text-indigo-500" />
-                  </button>
+                  <SpeakButton text={w.mr} />
                 </div>
                 <p className="mt-3 text-xs text-slate-400 bg-slate-50 rounded-xl px-3 py-2 indic-text">
                   <span className="not-italic font-semibold text-slate-500">e.g.</span> {w.example}
@@ -90,18 +128,22 @@ export default function LessonPage() {
             {patterns.map((p, i) => (
               <div key={i} className="bg-white rounded-2xl border border-slate-200 p-5">
                 <p className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-2">{p.title}</p>
-                <div className="bg-amber-50 rounded-xl px-4 py-3 mb-3">
-                  <p className="text-xl font-black text-slate-900 indic-text">{p.structure}</p>
-                  <p className="text-sm text-slate-500 mt-0.5">{p.meaning}</p>
+                <div className="bg-amber-50 rounded-xl px-4 py-3 mb-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xl font-black text-slate-900 indic-text">{p.structure}</p>
+                    <p className="text-sm text-slate-500 mt-0.5">{p.meaning}</p>
+                  </div>
+                  <SpeakButton text={p.structure.replace("___", "अनन्या")} />
                 </div>
                 <div className="space-y-2">
                   {p.examples.map((ex, j) => (
                     <div key={j} className="flex items-start gap-2 text-sm">
                       <span className="text-amber-400 font-bold mt-0.5">→</span>
-                      <div>
+                      <div className="flex-1">
                         <span className="font-semibold text-slate-800 indic-text">{ex.mr}</span>
                         <span className="text-slate-400 ml-2">({ex.en})</span>
                       </div>
+                      <SpeakButton text={ex.mr} />
                     </div>
                   ))}
                 </div>
@@ -110,7 +152,7 @@ export default function LessonPage() {
           </div>
         </section>
 
-        {/* Muhavara / Cultural Tip */}
+        {/* Cultural Note */}
         <section className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100 p-5">
           <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">🌿 Cultural Note · म्हणी</p>
           <p className="font-bold text-slate-800 indic-text text-lg">नमस्कार म्हणजे आदर.</p>

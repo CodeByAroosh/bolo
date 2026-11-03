@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Mic, Volume2, BookOpen, Lightbulb, Loader2 } from "lucide-react";
+import { ArrowLeft, Mic, Volume2, BookOpen, Lightbulb, Loader2, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 const words = [
@@ -18,6 +18,7 @@ const patterns = [
     title: "Introducing yourself",
     structure: "माझे नाव ___ आहे.",
     meaning: "My name is ___.",
+    speakAs: "माझे नाव अनन्या आहे.",
     examples: [
       { mr: "माझे नाव अनन्या आहे.", en: "My name is Ananya." },
       { mr: "माझे नाव राज आहे.", en: "My name is Raj." },
@@ -27,6 +28,7 @@ const patterns = [
     title: "Asking 'how are you?'",
     structure: "तुम्ही कसे आहात?",
     meaning: "How are you? (formal)",
+    speakAs: "तुम्ही कसे आहात?",
     examples: [
       { mr: "मी ठीक आहे.", en: "I am fine." },
       { mr: "मी छान आहे, धन्यवाद.", en: "I am great, thank you." },
@@ -34,39 +36,59 @@ const patterns = [
   },
 ];
 
-async function playTTS(text: string, setLoading: (v: boolean) => void) {
-  setLoading(true);
-  try {
-    const res = await fetch("/api/tts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    });
-    if (!res.ok) throw new Error("TTS failed");
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.play();
-    audio.onended = () => URL.revokeObjectURL(url);
-  } catch (e) {
-    console.error(e);
-  } finally {
-    setLoading(false);
+async function playTTS(text: string): Promise<void> {
+  const res = await fetch("/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `TTS error ${res.status}`);
   }
+  const arrayBuffer = await res.arrayBuffer();
+  // Use AudioContext for reliable cross-browser WAV decoding
+  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  const ctx = new AudioCtx();
+  const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+  const source = ctx.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(ctx.destination);
+  await new Promise<void>((resolve) => {
+    source.onended = () => { ctx.close(); resolve(); };
+    source.start(0);
+  });
 }
 
 function SpeakButton({ text }: { text: string }) {
-  const [loading, setLoading] = useState(false);
+  const [state, setState] = useState<"idle" | "loading" | "error">("idle");
+
+  async function handle() {
+    setState("loading");
+    try {
+      await playTTS(text);
+      setState("idle");
+    } catch (e) {
+      console.error(e);
+      setState("error");
+      setTimeout(() => setState("idle"), 2000);
+    }
+  }
+
   return (
     <button
-      onClick={() => playTTS(text, setLoading)}
-      disabled={loading}
-      className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0 hover:bg-indigo-100 transition-colors disabled:opacity-50"
-      title="Hear pronunciation"
+      onClick={handle}
+      disabled={state === "loading"}
+      title={state === "error" ? "Playback failed — try again" : "Hear pronunciation"}
+      className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-50 ${
+        state === "error"
+          ? "bg-red-50 hover:bg-red-100"
+          : "bg-indigo-50 hover:bg-indigo-100"
+      }`}
     >
-      {loading
-        ? <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
-        : <Volume2 className="w-4 h-4 text-indigo-500" />}
+      {state === "loading" && <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />}
+      {state === "error"  && <AlertCircle className="w-4 h-4 text-red-500" />}
+      {state === "idle"   && <Volume2 className="w-4 h-4 text-indigo-500" />}
     </button>
   );
 }
@@ -91,8 +113,7 @@ export default function LessonPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
-
-        {/* Vocabulary Section */}
+        {/* Vocabulary */}
         <section>
           <div className="flex items-center gap-2 mb-4">
             <BookOpen className="w-5 h-5 text-indigo-500" />
@@ -111,14 +132,14 @@ export default function LessonPage() {
                   <SpeakButton text={w.mr} />
                 </div>
                 <p className="mt-3 text-xs text-slate-400 bg-slate-50 rounded-xl px-3 py-2 indic-text">
-                  <span className="not-italic font-semibold text-slate-500">e.g.</span> {w.example}
+                  <span className="font-semibold text-slate-500">e.g.</span> {w.example}
                 </p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Patterns Section */}
+        {/* Patterns */}
         <section>
           <div className="flex items-center gap-2 mb-4">
             <Lightbulb className="w-5 h-5 text-amber-500" />
@@ -133,12 +154,12 @@ export default function LessonPage() {
                     <p className="text-xl font-black text-slate-900 indic-text">{p.structure}</p>
                     <p className="text-sm text-slate-500 mt-0.5">{p.meaning}</p>
                   </div>
-                  <SpeakButton text={p.structure.replace("___", "अनन्या")} />
+                  <SpeakButton text={p.speakAs} />
                 </div>
                 <div className="space-y-2">
                   {p.examples.map((ex, j) => (
-                    <div key={j} className="flex items-start gap-2 text-sm">
-                      <span className="text-amber-400 font-bold mt-0.5">→</span>
+                    <div key={j} className="flex items-center gap-2 text-sm">
+                      <span className="text-amber-400 font-bold">→</span>
                       <div className="flex-1">
                         <span className="font-semibold text-slate-800 indic-text">{ex.mr}</span>
                         <span className="text-slate-400 ml-2">({ex.en})</span>
@@ -154,22 +175,22 @@ export default function LessonPage() {
 
         {/* Cultural Note */}
         <section className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100 p-5">
-          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">🌿 Cultural Note · म्हणी</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">🌿 Cultural Note</p>
           <p className="font-bold text-slate-800 indic-text text-lg">नमस्कार म्हणजे आदर.</p>
           <p className="text-sm text-slate-600 mt-1">
-            &quot;Namaskaar&quot; conveys respect — pressing palms together. Use it with elders and in formal settings.
-            With friends, &quot;हाय&quot; (hai) or &quot;हेल्लो&quot; (hello) are totally natural in modern Marathi.
+            &quot;Namaskaar&quot; conveys respect. Use it with elders and in formal settings.
+            With friends, &quot;हाय&quot; or &quot;हेल्लो&quot; are natural in modern Marathi.
           </p>
         </section>
 
-        {/* Voice Practice CTA */}
+        {/* CTA → Voice Practice */}
         <section className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white text-center">
           <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
             <Mic className="w-7 h-7 text-white" />
           </div>
-          <h3 className="font-black text-xl mb-1">Practice with Bolo AI</h3>
+          <h3 className="font-black text-xl mb-1">Ready to speak?</h3>
           <p className="text-emerald-100 text-sm mb-4">
-            Say these words aloud — Sarvam AI listens and gives instant feedback in Marathi.
+            Sarvam AI listens and won&apos;t let you skip until you say it right.
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
             <Link
@@ -186,7 +207,6 @@ export default function LessonPage() {
             </Link>
           </div>
         </section>
-
       </main>
     </div>
   );

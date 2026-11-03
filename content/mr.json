@@ -1,0 +1,235 @@
+{
+  "language": {
+    "code": "mr-IN",
+    "name": "Marathi",
+    "nativeName": "मराठी",
+    "script": "Devanagari",
+    "tts": {
+      "model": "bulbul:v4-flash",
+      "speaker": "ishita_mr_conversational",
+      "fallbackSpeaker": "anushka"
+    }
+  },
+  "tiers": [
+    {
+      "id": "t0",
+      "cefr": "pre-A1",
+      "name": "Akshar",
+      "canDo": "Read and recognize Marathi script and Barakhadi sounds",
+      "units": [
+        {
+          "id": "t0u1",
+          "title": "देवनागरी आणि मराठी मुळाक्षरे",
+          "titleRoman": "Devanagari aani Marathi Mulakshare",
+          "titleEn": "The Script & Alphabets",
+          "status": "authored",
+          "lessons": [
+            {
+              "type": "words",
+              "items": [
+                {
+                  "id": "mr-a",
+                  "target": "अ",
+                  "roman": "a",
+                  "en": "First vowel sound (like 'u' in 'cup')",
+                  "example": { "target": "अननस", "roman": "ananas", "en": "Pineapple" },
+                  "tags": ["vowel", "script"]
+                },
+                {
+                  "id": "mr-aa",
+                  "target": "आ",
+                  "roman": "aa",
+                  "en": "Long vowel sound (like 'a' in 'father')",
+                  "example": { "target": "आंबा", "roman": "aamba", "en": "Mango" },
+                  "tags": ["vowel", "script"]
+                },
+                {
+                  "id": "mr-k",
+                  "target": "क",
+                  "roman": "ka",
+                  "en": "Velar stop (like 'k' in 'kite')",
+                  "example": { "target": "कमळ", "roman": "kamal", "en": "Lotus" },
+                  "tags": ["consonant", "script"]
+                },
+                {
+                  "id": "mr-retro-l",
+                  "target": "ळ",
+                  "roman": "la (retroflex)",
+                  "en": "Special Marathi retroflex 'L' (tongue curls back to palate)",
+                  "example": { "target": "बाळ", "roman": "baal", "en": "Baby" },
+                  "tags": ["special-consonant", "pronunciation"]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t1",
+      "cefr": "A1",
+      "name": "Explorer",
+      "canDo": "Survive everyday greetings, self-introductions, and food orders in Marathi",
+      "units": [
+        {
+          "id": "t1u1",
+          "title": "नमस्कार! (Greetings)",
+          "titleRoman": "Namaskaar!",
+          "titleEn": "Greetings & Introductions",
+          "status": "authored",
+          "lessons": [
+            {
+              "type": "words",
+              "items": [
+                {
+                  "id": "mr-namaskar",
+                  "target": "नमस्कार",
+                  "roman": "namaskaar",
+                  "en": "Hello / Greetings (respectful)",
+                  "example": { "target": "नमस्कार, तुम्ही कसे आहात?", "roman": "namaskaar, tumhi kase aahaat?", "en": "Hello, how are you?" },
+                  "tags": ["greeting", "polite"]
+                },
+                {
+                  "id": "mr-naav",
+                  "target": "नाव",
+                  "roman": "naav",
+                  "en": "Name",
+                  "example": { "target": "माझे नाव राहुल आहे.", "roman": "maazhe naav Rahul aahe.", "en": "My name is Rahul." },
+                  "tags": ["identity", "noun"]
+                },
+                {
+                  "id": "mr-ahe",
+                  "target": "आहे",
+                  "roman": "aahe",
+                  "en": "is / exists",
+                  "example": { "target": "हे घर आहे.", "roman": "he ghar aahe.", "en": "This is a house." },
+                  "tags": ["verb", "auxiliary"]
+                },
+                {
+                  "id": "mr-dhanyavad",
+                  "target": "धन्यवाद",
+                  "roman": "dhanyavaad",
+                  "en": "Thank you",
+                  "example": { "target": "खूप खूप धन्यवाद!", "roman": "khoop khoop dhanyavaad!", "en": "Thank you very much!" },
+                  "tags": ["courtesy"]
+                },
+                {
+                  "id": "mr-kase",
+                  "target": "कसे",
+                  "roman": "kase",
+                  "en": "how (masculine / polite)",
+                  "example": { "target": "तुम्ही कसे आहात?", "roman": "tumhi kase aahaat?", "en": "How are you?" },
+                  "tags": ["question"]
+                },
+                {
+                  "id": "mr-chhan",
+                  "target": "छान",
+                  "roman": "chhaan",
+                  "en": "Good / Nice / Fine",
+                  "example": { "target": "मी छान आहे.", "roman": "mi chhaan aahe.", "en": "I am fine." },
+                  "tags": ["adjective"]
+                }
+              ]
+            },
+            {
+              "type": "pattern",
+              "points": [
+                {
+                  "id": "mr-equative",
+                  "rule": "Subject + [Predicate] + आहे = '[Subject] is [Predicate]'. The verb 'आहे' comes at the end.",
+                  "examples": [
+                    { "target": "माझे नाव अमित आहे.", "roman": "maazhe naav Amit aahe.", "en": "My name is Amit." },
+                    { "target": "हे पाणी आहे.", "roman": "he paani aahe.", "en": "This is water." }
+                  ],
+                  "pitfall": "Do not put 'आहे' first like English 'is': ✗ आहे माझे नाव अमित"
+                },
+                {
+                  "id": "mr-pronouns",
+                  "rule": "Use 'मी आहे' for 'I am', and 'तुम्ही आहात' for respectful 'You are'.",
+                  "examples": [
+                    { "target": "मी ठीक आहे.", "roman": "mi theek aahe.", "en": "I am alright." },
+                    { "target": "तुम्ही कुठे आहात?", "roman": "tumhi kuthe aahaat?", "en": "Where are you?" }
+                  ],
+                  "pitfall": "Mixing singular 'तू आहेस' with respectful 'तुम्ही आहात' when addressing elders or teachers."
+                }
+              ]
+            },
+            {
+              "type": "ears",
+              "prompt": "Listen and tap the matching Marathi words",
+              "items": [
+                { "target": "नमस्कार", "roman": "namaskaar", "en": "Hello" },
+                { "target": "माझे नाव", "roman": "maazhe naav", "en": "My name" },
+                { "target": "तुम्ही कसे आहात", "roman": "tumhi kase aahaat", "en": "How are you" },
+                { "target": "मी छान आहे", "roman": "mi chhaan aahe", "en": "I am fine" }
+              ]
+            },
+            {
+              "type": "muhavara",
+              "items": [
+                {
+                  "id": "mr-muhavara-1",
+                  "target": "जीवात जीव येणे",
+                  "roman": "jeevaat jeev yene",
+                  "literal": "Life entering back into life",
+                  "meaning": "To heave a deep sigh of relief / feel relieved after tension",
+                  "enEquivalent": "A breath of fresh air / a load off one's chest",
+                  "usage": {
+                    "target": "आईला सुखरूप बघून मुलाच्या जीवात जीव आला.",
+                    "roman": "aaila sukhroop baghoon mulaachya jeevaat jeev aala.",
+                    "en": "Seeing his mother safe, the son felt immense relief."
+                  },
+                  "register": "Everyday warm Marathi"
+                }
+              ]
+            },
+            {
+              "type": "bolo",
+              "questions": [
+                {
+                  "id": "q1",
+                  "tutorLine": {
+                    "target": "नमस्कार! तुमचे नाव काय आहे?",
+                    "roman": "namaskaar! tumche naav kaay aahe?",
+                    "en": "Hello! What is your name?"
+                  },
+                  "expect": {
+                    "mustUse": ["नाव", "आहे"],
+                    "englishPrompt": "Say: 'माझे नाव [Your Name] आहे' (My name is ...)"
+                  },
+                  "difficulty": 1
+                },
+                {
+                  "id": "q2",
+                  "tutorLine": {
+                    "target": "छान! तुम्ही कसे आहात?",
+                    "roman": "chhaan! tumhi kase aahaat?",
+                    "en": "Nice! How are you?"
+                  },
+                  "expect": {
+                    "mustUse": ["मी", "आहे"],
+                    "englishPrompt": "Say: 'मी छान आहे' or 'मी ठीक आहे' (I am fine)"
+                  },
+                  "difficulty": 2
+                },
+                {
+                  "id": "q3",
+                  "tutorLine": {
+                    "target": "तुम्हाला मराठी शिकायला आवडते का?",
+                    "roman": "tumhaala marathi shikayala aavadte kaa?",
+                    "en": "Do you like learning Marathi?"
+                  },
+                  "expect": {
+                    "mustUse": ["हो", "आवडते"],
+                    "englishPrompt": "Say: 'हो, मला मराठी शिकायला खूप आवडते' (Yes, I like learning Marathi very much)"
+                  },
+                  "difficulty": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
